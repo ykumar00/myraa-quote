@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: center; }
+        input { width: 100px; padding: 5px; text-align: right; }
+        .total { font-weight: bold; margin-top: 10px; }
+        button { padding: 10px 20px; margin-top: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Store Logo" width="150">
+        <h2>Quotation</h2>
+        <label>Client Name: <input type="text" id="clientName"></label>
+        <br><br>
+        <label>Silver Rate: <input type="number" id="silverRate" step="0.01"></label>
+        <br><br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Weight</th>
+                    <th>MC Rate</th>
+                    <th>Total MC</th>
+                </tr>
+            </thead>
+            <tbody id="itemTable">
+                <tr>
+                    <td>Nakash</td>
+                    <td><input type="number" class="weight" step="0.001"></td>
+                    <td><input type="number" class="mcRate" step="0.01"></td>
+                    <td class="totalMC">0</td>
+                </tr>
+                <tr>
+                    <td>Temple</td>
+                    <td><input type="number" class="weight" step="0.001"></td>
+                    <td><input type="number" class="mcRate" step="0.01"></td>
+                    <td class="totalMC">0</td>
+                </tr>
+                <tr>
+                    <td>Gheru</td>
+                    <td><input type="number" class="weight" step="0.001"></td>
+                    <td><input type="number" class="mcRate" step="0.01"></td>
+                    <td class="totalMC">0</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="total">Total Weight: <span id="totalWeight">0.000</span></p>
+        <button onclick="generatePDF()">Generate PDF</button>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.weight, .mcRate').forEach(input => {
+            input.addEventListener('input', updateTotals);
+            input.addEventListener('blur', formatWeight);
+        });
+
+        function updateTotals() {
+            let totalWeight = 0;
+            document.querySelectorAll('#itemTable tr').forEach(row => {
+                let weight = parseFloat(row.children[1].children[0].value) || 0;
+                let mcRate = parseFloat(row.children[2].children[0].value) || 0;
+                let totalMC = weight * mcRate;
+                row.children[3].textContent = formatIndianNumber(totalMC);
+                totalWeight += weight;
+            });
+            document.getElementById('totalWeight').textContent = totalWeight.toFixed(3);
+        }
+
+        function formatIndianNumber(num) {
+            return new Intl.NumberFormat('en-IN').format(num.toFixed(2));
+        }
+
+        function formatWeight(event) {
+            let input = event.target;
+            let value = parseFloat(input.value);
+            if (!isNaN(value)) {
+                input.value = value.toFixed(3);
+            }
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF();
+            
+            doc.text("Quotation", 10, 10);
+            doc.text("Client Name: " + document.getElementById('clientName').value, 10, 20);
+            doc.text("Silver Rate: " + document.getElementById('silverRate').value, 10, 30);
+            
+            let y = 40;
+            doc.text("Item", 10, y);
+            doc.text("Weight", 60, y);
+            doc.text("MC Rate", 110, y);
+            doc.text("Total MC", 160, y);
+            y += 10;
+            
+            document.querySelectorAll('#itemTable tr').forEach(row => {
+                doc.text(row.children[0].textContent, 10, y);
+                doc.text(parseFloat(row.children[1].children[0].value).toFixed(3), 60, y);
+                doc.text(row.children[2].children[0].value, 110, y);
+                doc.text(formatIndianNumber(parseFloat(row.children[3].textContent.replace(/,/g, ''))), 160, y);
+                y += 10;
+            });
+            
+            doc.text("Total Weight: " + document.getElementById('totalWeight').textContent, 10, y + 10);
+            
+            doc.save("Quotation.pdf");
+        }
+    </script>
+</body>
+</html>
