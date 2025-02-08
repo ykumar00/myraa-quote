@@ -1,120 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotation Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Quote Generator</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid black; padding: 8px; text-align: center; }
-        input { width: 100px; padding: 5px; text-align: right; }
-        .total { font-weight: bold; margin-top: 10px; }
-        button { padding: 10px 20px; margin-top: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
+        img {
+            max-width: 300px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 5px;
+            font-size: 17px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card input {
+            width: 60%;
+            /* Adjust width as needed */
+            padding: 5px;
+            font-size: 16px;
+            margin-top: 4px;
+
+        }
+
+
+        .card {
+
+            padding: 10px;
+            max-width: 350px;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: 0 0 0 1px;
+            padding-right: 25px;
+        }
+
+
+        .collectionName {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 95%;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        .quote {
+
+            max-width: 350px;
+        }
     </style>
+
+
+
+
+
+
 </head>
+
 <body>
-    <div class="container">
-        <img src="logo.png" alt="Store Logo" width="150">
-        <h2>Quotation</h2>
-        <label>Client Name: <input type="text" id="clientName"></label>
-        <br><br>
-        <label>Silver Rate: <input type="number" id="silverRate" step="0.01"></label>
-        <br><br>
-        <table>
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Weight</th>
-                    <th>MC Rate</th>
-                    <th>Total MC</th>
-                </tr>
-            </thead>
-            <tbody id="itemTable">
-                <tr>
-                    <td>Nakash</td>
-                    <td><input type="number" class="weight" step="0.001"></td>
-                    <td><input type="number" class="mcRate" step="0.01"></td>
-                    <td class="totalMC">0</td>
-                </tr>
-                <tr>
-                    <td>Temple</td>
-                    <td><input type="number" class="weight" step="0.001"></td>
-                    <td><input type="number" class="mcRate" step="0.01"></td>
-                    <td class="totalMC">0</td>
-                </tr>
-                <tr>
-                    <td>Gheru</td>
-                    <td><input type="number" class="weight" step="0.001"></td>
-                    <td><input type="number" class="mcRate" step="0.01"></td>
-                    <td class="totalMC">0</td>
-                </tr>
-            </tbody>
-        </table>
-        <p class="total">Total Weight: <span id="totalWeight">0.000</span></p>
-        <button onclick="generatePDF()">Generate PDF</button>
+    <div id="quote" class="quote">
+
+        <img src="logo.jpg" alt="Store Logo">
+
+        <label for="clientName">Client Name:</label>
+        <input type="text" id="clientName" placeholder="Enter client name">
+
+
+        <div class="card">
+            <div class="collectionName">ANTIQUE COLLECTION</div>
+
+            <label>Gross Wt: <input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+
+
+        <div class="card">
+            <div class="collectionName">STONE COLLECTION</div>
+
+            <label>Gross Wt:<input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+        <div class="card">
+            <div class="collectionName">NAKASH COLLECTION</div>
+
+            <label>Gross Wt:<input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+        <div class="card">
+            <div class="collectionName">Maala</div>
+
+            <label>Gross Wt:<input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+        <div class="card">
+            <div class="collectionName">ANTIQUE COLLECTION</div>
+
+            <label>Gross Wt:<input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+
+        <div class="card">
+            <div class="collectionName">THREADING CHARGES</div>
+
+            <label>Quantity:<input type="number" class="qty"
+                    onblur="multiply(this.parentElement.parentElement)" step="1"></label>
+
+            <label>Rate: <input type="number" class="rate"
+                    onblur="multiply(this.parentElement.parentElement)"></label>
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+
+        <div class="card">
+            <div class="collectionName">BEADS CHARGES</div>
+
+            <label>Weight:<input type="number" class="qty"
+                    onblur="multiply(this.parentElement.parentElement)" step="1"></label>
+
+            <label>Rate: <input type="number" class="rate"
+                    onblur="multiply(this.parentElement.parentElement)"></label>
+
+            <label>Total Amt:<input type="text" class="totalMC" readonly></label>
+        </div>
+
+
+
+
+        <br>
+
+        <div>
+            <label>Total Nett Weight:</label>
+            <input type="text" id="totalNett" readonly>
+            <br>
+            <label>Total MC:</label>
+            <input type="text" id="totalMC" readonly>
+        </div>
+
+
     </div>
-    
+
+    <button style="margin-top:15px;" onclick="generatePDF()">Generate PDF</button>
+
+
+
     <script>
-        document.querySelectorAll('.weight, .mcRate').forEach(input => {
-            input.addEventListener('input', updateTotals);
-            input.addEventListener('blur', formatWeight);
-        });
+        function formatNumber(num, decimals) {
+            return parseFloat(num || 0).toFixed(decimals);
+        }
+        function formatIndianCurrency(num) {
+            return new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+        }
+        function updateCalculations(row) {
+            let grossWtInput = row.querySelector(".gross");
+            let tagWtInput = row.querySelector(".tag");
+            let mcRateInput = row.querySelector(".mcRate");
+            let nettWtInput = row.querySelector(".nett");
+            let totalMCInput = row.querySelector(".totalMC");
+
+            let grossWt = parseFloat(grossWtInput.value) || 0;
+            let tagWt = parseFloat(tagWtInput.value) || 0;
+            let mcRate = parseFloat(mcRateInput.value) || 0;
+
+            grossWtInput.value = formatNumber(grossWt, 3);
+            tagWtInput.value = formatNumber(tagWt, 3);
+
+            let nettWt = grossWt - tagWt;
+            let totalMC = nettWt * mcRate;
+
+            nettWtInput.value = formatNumber(nettWt, 3);
+            totalMCInput.value = formatIndianCurrency(totalMC);
+            updateTotals();
+        }
+
+        function multiply(row) {
+            let qtyInput = row.querySelector(".qty");
+            let rateInput = row.querySelector(".rate");
+            let totalMCInput = row.querySelector(".totalMC");
+            let qty = parseFloat(qtyInput.value) || 0;
+            let rate = parseFloat(rateInput.value) || 0;
+            qtyInput.value = formatNumber(qty, 3);
+            rateInput.value = formatNumber(rate, 2);
+            let totalMC = qty * rate;
+            totalMCInput.value = formatIndianCurrency(totalMC);
+            updateTotals();
+        }
+
+
 
         function updateTotals() {
-            let totalWeight = 0;
-            document.querySelectorAll('#itemTable tr').forEach(row => {
-                let weight = parseFloat(row.children[1].children[0].value) || 0;
-                let mcRate = parseFloat(row.children[2].children[0].value) || 0;
-                let totalMC = weight * mcRate;
-                row.children[3].textContent = formatIndianNumber(totalMC);
-                totalWeight += weight;
+            let totalNett = 0;
+            let totalMC = 0;
+
+            document.querySelectorAll(".nett").forEach(input => {
+                totalNett += parseFloat(input.value) || 0;
             });
-            document.getElementById('totalWeight').textContent = totalWeight.toFixed(3);
+
+            document.querySelectorAll(".totalMC").forEach(input => {
+                totalMC += parseFloat(input.value.replace(/,/g, '')) || 0;
+            });
+
+            document.getElementById("totalNett").value = formatNumber(totalNett, 3);
+            document.getElementById("totalMC").value = formatIndianCurrency(totalMC);
         }
 
-        function formatIndianNumber(num) {
-            return new Intl.NumberFormat('en-IN').format(num.toFixed(2));
-        }
 
-        function formatWeight(event) {
-            let input = event.target;
-            let value = parseFloat(input.value);
-            if (!isNaN(value)) {
-                input.value = value.toFixed(3);
-            }
-        }
 
         function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            let doc = new jsPDF();
-            
-            doc.text("Quotation", 10, 10);
-            doc.text("Client Name: " + document.getElementById('clientName').value, 10, 20);
-            doc.text("Silver Rate: " + document.getElementById('silverRate').value, 10, 30);
-            
-            let y = 40;
-            doc.text("Item", 10, y);
-            doc.text("Weight", 60, y);
-            doc.text("MC Rate", 110, y);
-            doc.text("Total MC", 160, y);
-            y += 10;
-            
-            document.querySelectorAll('#itemTable tr').forEach(row => {
-                doc.text(row.children[0].textContent, 10, y);
-                doc.text(parseFloat(row.children[1].children[0].value).toFixed(3), 60, y);
-                doc.text(row.children[2].children[0].value, 110, y);
-                doc.text(formatIndianNumber(parseFloat(row.children[3].textContent.replace(/,/g, ''))), 160, y);
-                y += 10;
-            });
-            
-            doc.text("Total Weight: " + document.getElementById('totalWeight').textContent, 10, y + 10);
-            
-            doc.save("Quotation.pdf");
+            var element = document.getElementById('quote');
+            var pdfname = document.getElementById('clientName').value + '.pdf';
+
+            var options = {
+                margin: 0,
+                filename: pdfname,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                pagebreak: { mode: 'avoid-all', before: '#page2el' }
+            };
+
+
+            // Old monolithic-style usage:
+            html2pdf(element, options);
         }
+
+
     </script>
+
+
+
+
 </body>
+
 </html>
