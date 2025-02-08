@@ -10,6 +10,7 @@
         integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
     <style>
         img {
             max-width: 300px;
@@ -183,11 +184,10 @@
         <div class="card">
             <div class="collectionName">THREADING CHARGES</div>
 
-            <label>Quantity:<input type="number" class="qty"
-                    onblur="multiply(this.parentElement.parentElement)" step="1"></label>
+            <label>Quantity:<input type="number" class="qty" onblur="multiply(this.parentElement.parentElement)"
+                    step="1"></label>
 
-            <label>Rate: <input type="number" class="rate"
-                    onblur="multiply(this.parentElement.parentElement)"></label>
+            <label>Rate: <input type="number" class="rate" onblur="multiply(this.parentElement.parentElement)"></label>
 
             <label>Total MC:<input type="text" class="totalMC" readonly></label>
         </div>
@@ -195,11 +195,10 @@
         <div class="card">
             <div class="collectionName">BEADS CHARGES</div>
 
-            <label>Weight:<input type="number" class="qty"
-                    onblur="multiply(this.parentElement.parentElement)" step="1"></label>
+            <label>Weight:<input type="number" class="qty" onblur="multiply(this.parentElement.parentElement)"
+                    step="1"></label>
 
-            <label>Rate: <input type="number" class="rate"
-                    onblur="multiply(this.parentElement.parentElement)"></label>
+            <label>Rate: <input type="number" class="rate" onblur="multiply(this.parentElement.parentElement)"></label>
 
             <label>Total Amt:<input type="text" class="totalMC" readonly></label>
         </div>
@@ -220,8 +219,16 @@
 
     </div>
 
+
+
+
+
+
+
     <button style="margin-top:15px;" onclick="generatePDF()">Generate PDF</button>
 
+
+    <div id="pdf-container" style="margin-top: 20px;"></div>
 
 
     <script>
@@ -287,26 +294,74 @@
 
 
         function generatePDF() {
-            var element = document.getElementById('quote');
-            var pdfname = document.getElementById('clientName').value + '.pdf';
+            let clientName = document.getElementById('clientName').value || "Quote";
+            let pdfname = clientName + '.pdf';
+
+            let pdfContainer = document.getElementById("pdf-container");
+            pdfContainer.innerHTML = ""; // Clear previous content
+
+            let tableHTML = `
+        <h2 style="text-align:center;">Quotation</h2>
+        <p><strong>Client Name:</strong> ${clientName}</p>
+        <table border="1" style="width:100%; border-collapse: collapse; text-align:center;">
+            <tr>
+                <th>Collection</th>
+                <th>Gross Wt</th>
+                <th>Tag Wt</th>
+                <th>Nett Wt</th>
+                <th>MC Rate</th>
+                <th>MC Total</th>
+            </tr>
+    `;
+
+            document.querySelectorAll('.card').forEach(card => {
+                let collectionName = card.querySelector('.collectionName').textContent;
+                let grossWt = card.querySelector('.gross')?.value || '0.000';
+                let tagWt = card.querySelector('.tag')?.value || '0.000';
+                let nettWt = card.querySelector('.nett')?.value || '0.000';
+                let mcRate = card.querySelector('.mcRate')?.value || '0';
+                let mcTotal = card.querySelector('.totalMC')?.value || '0.00';
+
+                if (grossWt !== '0.000' || tagWt !== '0.000' || mcRate !== '0') {
+                    tableHTML += `
+                <tr>
+                    <td>${collectionName}</td>
+                    <td>${grossWt}</td>
+                    <td>${tagWt}</td>
+                    <td>${nettWt}</td>
+                    <td>${mcRate}</td>
+                    <td>${mcTotal}</td>
+                </tr>
+            `;
+                }
+            });
+
+            tableHTML += `</table>`;
+
+            let totalNett = document.getElementById("totalNett").value;
+            let totalMC = document.getElementById("totalMC").value;
+
+            tableHTML += `
+        <p><strong>Total Nett Weight:</strong> ${totalNett}</p>
+        <p><strong>Total MC:</strong> ${totalMC}</p>
+    `;
+
+            // Insert the table into the visible div
+            pdfContainer.innerHTML = tableHTML;
 
             var options = {
-                margin: 0,
+                
                 filename: pdfname,
-                image: { type: 'jpeg', quality: 0.98 },
+                
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-                pagebreak: { mode: 'avoid-all', before: '#page2el' }
             };
-
-
             // Old monolithic-style usage:
-            html2pdf(element, options);
+         html2pdf(pdfContainer, options);
         }
 
 
     </script>
-
 
 
 
