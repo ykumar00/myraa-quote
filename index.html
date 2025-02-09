@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote Generator</title>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+                 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
         img {
@@ -82,6 +81,9 @@
         <label for="clientName">Client Name:</label>
         <input type="text" id="clientName" placeholder="Enter client name">
 
+        <label for="clientName">City:</label>
+        <input type="text" id="cityName" placeholder="Enter City name">
+
 
         <div class="card">
             <div class="collectionName">ANTIQUE COLLECTION</div>
@@ -143,7 +145,7 @@
             <label>Total MC:<input type="text" class="totalMC" readonly></label>
         </div>
         <div class="card">
-            <div class="collectionName">Maala</div>
+            <div class="collectionName">MAALA</div>
 
             <label>Gross Wt:<input type="number" class="gross"
                     onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
@@ -162,7 +164,7 @@
             <label>Total MC:<input type="text" class="totalMC" readonly></label>
         </div>
         <div class="card">
-            <div class="collectionName">ANTIQUE COLLECTION</div>
+            <div class="collectionName">CHAINS</div>
 
             <label>Gross Wt:<input type="number" class="gross"
                     onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
@@ -180,6 +182,50 @@
 
             <label>Total MC:<input type="text" class="totalMC" readonly></label>
         </div>
+
+
+        <div class="card">
+            <div class="collectionName">PATTI / BACKCHAINS</div>
+
+            <label>Gross Wt:<input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+
+        <div class="card">
+            <div class="collectionName">PREMIUM COLLECTION</div>
+
+            <label>Gross Wt:<input type="number" class="gross"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+            <label>Tag Wt: <input type="number" class="tag"
+                    onblur="updateCalculations(this.parentElement.parentElement)" step="0.001"></label>
+
+
+            <label>Nett Wt: <input type="text" class="nett" readonly></label>
+
+
+            <label>MC Rate: <input type="number" class="mcRate"
+                    onblur="updateCalculations(this.parentElement.parentElement)"></label>
+
+
+            <label>Total MC:<input type="text" class="totalMC" readonly></label>
+        </div>
+
+
+
 
         <div class="card">
             <div class="collectionName">THREADING CHARGES</div>
@@ -203,6 +249,18 @@
             <label>Total Amt:<input type="text" class="totalMC" readonly></label>
         </div>
 
+        <div class="card">
+            <div class="collectionName">OTHER CHARGES</div>
+            <label>Amt:<input type="text" class="totalMC"
+                    onblur="updateTotals(this.parentElement.parentElement)"></label>
+        </div>
+
+
+        <div class="card">
+            <div class="collectionName">REMARKS</div>
+            <label>Remarks:<input type="text" class="narration"></label>
+        </div>
+
 
 
 
@@ -211,8 +269,11 @@
         <div>
             <label>Total Nett Weight:</label>
             <input type="text" id="totalNett" readonly>
+            <label>Silver Rate:</label>
+            <input type="number" id="silverRate" class="silverRate" step="0.01"
+                onblur="multiply(this.parentElement.parentElement)">
             <br>
-            <label>Total MC:</label>
+            <label>Total Amount Balance:</label>
             <input type="text" id="totalMC" readonly>
         </div>
 
@@ -228,7 +289,7 @@
     <button style="margin-top:15px;" onclick="generatePDF()">Generate PDF</button>
 
 
-    <div id="pdf-container" style="margin-top: 20px;"></div>
+    <div id="pdf-container" style="margin-top: 20px; width: 10in; max-height: 7in;"></div>
 
 
     <script>
@@ -270,6 +331,10 @@
             rateInput.value = formatNumber(rate, 2);
             let totalMC = qty * rate;
             totalMCInput.value = formatIndianCurrency(totalMC);
+
+
+            let silverRateInput = document.querySelector(".silverRate")
+            silverRateInput.value = formatIndianCurrency(silverRateInput.value) || 0;
             updateTotals();
         }
 
@@ -349,15 +414,30 @@
             // Insert the table into the visible div
             pdfContainer.innerHTML = tableHTML;
 
+
+
+
+
+            var element = document.getElementById('pdf-container');
+            
             var options = {
-                
+                margin: 0.5,
                 filename: pdfname,
-                
+                image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+                pagebreak: { mode: 'avoid-all', before: '#page2el' }
             };
+
+
             // Old monolithic-style usage:
-         html2pdf(pdfContainer, options);
+            html2pdf(element, options);
+
+
+
+
+
+
         }
 
 
