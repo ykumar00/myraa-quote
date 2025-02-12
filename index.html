@@ -51,9 +51,11 @@
 
 
         .collectionName {
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             font-size: 20px;
+            font-weight: bold;
             margin-bottom: 15px;
+            
         }
 
         input {
@@ -78,7 +80,7 @@
 <body>
     <div id="quote" class="quote">
 
-        <img src="logo.png" alt="Store Logo">
+        <img src="logo.jpg" alt="Store Logo">
 
         <label for="clientName">Client Name:</label>
         <input type="text" id="clientName" placeholder="Enter client name">
@@ -253,17 +255,15 @@
 
         <div class="card">
             <div class="collectionName">OTHER CHARGES</div>
-            <label>Amt:<input type="text" class="totalMC"
+            <label>Amt:<input type="text" class="totalMC" id="otherCharges"
                     onblur="updateTotals(this.parentElement.parentElement)"></label>
         </div>
 
 
         <div class="card">
             <div class="collectionName">REMARKS</div>
-            <label>Remarks:<input type="text" class="narration"></label>
+            <label>Remarks:<input type="text" class="narration" id="remarks"></label>
         </div>
-
-
 
 
         <br>
@@ -319,7 +319,7 @@
             tagWtInput.value = formatNumber(tagWt, 3);
 
             let nettWt = grossWt - tagWt;
-            let totalMC = nettWt * mcRate;
+            let totalMC = Math.round(nettWt * mcRate);
 
             nettWtInput.value = formatNumber(nettWt, 3);
             totalMCInput.value = formatIndianCurrency(totalMC);
@@ -334,7 +334,7 @@
             let rate = parseFloat(rateInput.value) || 0;
             qtyInput.value = formatNumber(qty, 3);
             rateInput.value = formatNumber(rate, 2);
-            let totalMC = qty * rate;
+            let totalMC = Math.round(qty * rate);
             totalMCInput.value = formatIndianCurrency(totalMC);
 
 
@@ -427,8 +427,11 @@
             let beadsRate = document.getElementById("beadsRate").value;
             let beadsAmt = document.getElementById("beadsAmt").value;
 
+            let otherCharges = document.getElementById("otherCharges").value;
+            let remarms = document.getElementById("remarks");
+
             if(threadingQty != 0){   tableHTML += `
-            <p>Threading Charges: ${threadingQty} x ${threadingRate} = ${threadingRate}</p>
+            <p>Threading Charges: ${threadingQty} x ${threadingRate} = ${threadingAmt}</p>
             `
             }
 
@@ -439,9 +442,20 @@
             }
         
 
+            if(beadsWt != 0){
+            tableHTML += `
+            <p>Other Charges: ${otherCharges}</p>
+            `
+            }
+
+
+
             tableHTML += `
             <p><strong>Total Nett Weight:</strong> ${totalNett}</p>
             <p><strong>Total MC:</strong> ${totalMC} + 3% = ${mcInclGST}</p>
+            <br>
+
+            <p>Remarks: ${remarks}<p>
         
             <p style="text-align: right;">MR</p>
     `;
