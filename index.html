@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote Generator</title>
+    <title>Myraa Silver</title>
 
 
 
@@ -55,7 +55,7 @@
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 15px;
-            
+
         }
 
         input {
@@ -67,6 +67,22 @@
         .quote {
 
             max-width: 350px;
+        }
+
+        .tableNumber {
+
+            text-align: right;
+            padding-right: 15px;
+        }
+
+
+        .tableCollectionName {
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        tr {
+            height: 30px;
         }
     </style>
 
@@ -80,7 +96,7 @@
 <body>
     <div id="quote" class="quote">
 
-        <img src="logo.jpg" alt="Store Logo">
+        <img src="logo.png" alt="Store Logo">
 
         <label for="clientName">Client Name:</label>
         <input type="text" id="clientName" placeholder="Enter client name">
@@ -234,10 +250,11 @@
         <div class="card">
             <div class="collectionName">THREADING CHARGES</div>
 
-            <label>Quantity:<input type="number" class="qty" id="threadingQty" onblur="multiply(this.parentElement.parentElement)"
-                    step="1"></label>
+            <label>Quantity:<input type="number" class="qty" id="threadingQty"
+                    onblur="multiply(this.parentElement.parentElement)" step="1"></label>
 
-            <label>Rate: <input type="number" class="rate" id="threadingRate" onblur="multiply(this.parentElement.parentElement)"></label>
+            <label>Rate: <input type="number" class="rate" id="threadingRate"
+                    onblur="multiply(this.parentElement.parentElement)"></label>
 
             <label>Total Amt:<input type="text" class="totalMC" id="threadingAmt" readonly></label>
         </div>
@@ -245,10 +262,11 @@
         <div class="card">
             <div class="collectionName">BEADS CHARGES</div>
 
-            <label>Weight:<input type="number" class="qty" id="beadsWt" onblur="multiply(this.parentElement.parentElement)"
-                    step="1"></label>
+            <label>Weight:<input type="number" class="qty" id="beadsWt"
+                    onblur="multiply(this.parentElement.parentElement)" step="1"></label>
 
-            <label>Rate: <input type="number" class="rate" id="beadsRate" onblur="multiply(this.parentElement.parentElement)"></label>
+            <label>Rate: <input type="number" class="rate" id="beadsRate"
+                    onblur="multiply(this.parentElement.parentElement)"></label>
 
             <label>Total Amt:<input type="text" class="totalMC" id="beadsAmt" readonly></label>
         </div>
@@ -273,20 +291,21 @@
             <input type="text" id="totalNett" readonly>
             <label>Silver Rate:</label>
             <input type="number" id="silverRate" class="silverRate" step="0.01"
-                onblur="multiply(this.parentElement.parentElement)">
+                onblur="updateTotals(this.parentElement.parentElement)">
             <br>
-            <label>Total Amount Balance:</label>
+            <label>GST Rate:</label>
+            <input type="number" id="gstRate" class="gstRate" step="0.01"
+                onblur="updateTotals(this.parentElement.parentElement)">
+            <br>
+            <label>Total MC:</label>
             <input type="text" id="totalMC" readonly>
 
-            <input id="hiddenTotal" type="text" style="display: none;">
-
+            <input id="hiddenTotalMC" type="text" style="display: none;">
+            <input id="hiddenTotalNett" type="text" style="display: none;">
         </div>
 
 
     </div>
-
-
-
 
 
 
@@ -330,16 +349,20 @@
             let qtyInput = row.querySelector(".qty");
             let rateInput = row.querySelector(".rate");
             let totalMCInput = row.querySelector(".totalMC");
+
             let qty = parseFloat(qtyInput.value) || 0;
             let rate = parseFloat(rateInput.value) || 0;
+            let totalMC = Math.round(qty * rate);
+
             qtyInput.value = formatNumber(qty, 3);
             rateInput.value = formatNumber(rate, 2);
-            let totalMC = Math.round(qty * rate);
+
             totalMCInput.value = formatIndianCurrency(totalMC);
 
 
-            let silverRateInput = document.querySelector(".silverRate")
+            let silverRateInput = document.getElementById("silverRate");
             silverRateInput.value = formatIndianCurrency(silverRateInput.value) || 0;
+
             updateTotals();
         }
 
@@ -357,9 +380,12 @@
                 totalMC += parseFloat(input.value.replace(/,/g, '')) || 0;
             });
 
-            document.getElementById("hiddenTotal").value = totalMC;
+            document.getElementById("hiddenTotalMC").value = totalMC;
+            document.getElementById("hiddenTotalNett").value = totalNett;
+
             document.getElementById("totalNett").value = formatNumber(totalNett, 3);
             document.getElementById("totalMC").value = formatIndianCurrency(totalMC);
+
         }
 
 
@@ -377,7 +403,7 @@
 
             let tableHTML = `
         <h2 style="text-align:center;">ESTIMATE</h2>
-        <p>${today}</p>
+        <p style="text-align: right;"><strong>Date: </strong>${today}</p>
         <p><strong>Client Name:</strong> ${clientName}${cityName}</p>
         <table border="1" style="width:100%; border-collapse: collapse; text-align:center;">
             <tr>
@@ -401,12 +427,12 @@
                 if (grossWt !== '0.000' || tagWt !== '0.000' || mcRate !== '0') {
                     tableHTML += `
                 <tr>
-                    <td>${collectionName}</td>
-                    <td>${grossWt}</td>
-                    <td>${tagWt}</td>
-                    <td>${nettWt}</td>
-                    <td>${mcRate}</td>
-                    <td>${mcTotal}</td>
+                    <td class="tableCollectionName">${collectionName}</td>
+                    <td class="tableNumber">${grossWt}</td>
+                    <td class="tableNumber">${tagWt}</td>
+                    <td class="tableNumber">${nettWt}</td>
+                    <td class="tableNumber">${mcRate}</td>
+                    <td class="tableNumber">${mcTotal}</td>
                 </tr>
             `;
                 }
@@ -414,10 +440,17 @@
 
             tableHTML += `</table>`;
 
-            let totalNett = document.getElementById("totalNett").value;
-            let totalMC = document.getElementById("totalMC").value;
+            let totalNett = document.getElementById("hiddenTotalNett").value;
+            let totalMC = document.getElementById("hiddenTotalMC").value;
+            let gstRate = document.getElementById("gstRate").value || 0;
+            let silverRate = document.getElementById("silverRate").value || 0;
 
-            let mcInclGST = formatIndianCurrency(document.getElementById("hiddenTotal").value * 1.03);
+            totalMC = Math.round((totalNett * silverRate) + (totalMC * (1 + (gstRate / 100))));
+
+            totalMC = formatIndianCurrency(totalMC);
+            totalNett = formatIndianCurrency(totalNett);
+
+            //let mcInclGST = formatIndianCurrency(Math.round(document.getElementById("hiddenTotalMC").value * 1.03));
 
             let threadingQty = document.getElementById("threadingQty").value;
             let threadingRate = document.getElementById("threadingRate").value;
@@ -428,35 +461,33 @@
             let beadsAmt = document.getElementById("beadsAmt").value;
 
             let otherCharges = document.getElementById("otherCharges").value;
-            let remarms = document.getElementById("remarks");
+            let remarks = document.getElementById("remarks").value;
 
-            if(threadingQty != 0){   tableHTML += `
-            <p>Threading Charges: ${threadingQty} x ${threadingRate} = ${threadingAmt}</p>
+            if (threadingQty != 0) {
+                tableHTML += `
+            <p><strong>Threading Charges: </strong>${threadingQty} x ${threadingRate} = ${threadingAmt}</p>
             `
             }
 
-            if(beadsWt != 0){
-            tableHTML += `
-            <p>Beads Charges: ${beadsWt} x ${beadsRate} = ${beadsAmt}</p>
-            `
-            }
-        
-
-            if(beadsWt != 0){
-            tableHTML += `
-            <p>Other Charges: ${otherCharges}</p>
+            if (beadsWt != 0) {
+                tableHTML += `
+            <p><strong>Beads Charges: </strong>${beadsWt} x ${beadsRate} = ${beadsAmt}</p>
             `
             }
 
+
+            if (beadsWt != 0) {
+                tableHTML += `
+            <p><strong>Other Charges: </strong>${otherCharges}</p>
+            `
+            }
 
 
             tableHTML += `
             <p><strong>Total Nett Weight:</strong> ${totalNett}</p>
-            <p><strong>Total MC:</strong> ${totalMC} + 3% = ${mcInclGST}</p>
+            <p><strong>Total Amount:</strong> ${totalMC}</p>
             <br>
-
-            <p>Remarks: ${remarks}<p>
-        
+            <p><strong>Remarks: </strong>${remarks}<p>
             <p style="text-align: right;">MR</p>
     `;
 
@@ -478,10 +509,6 @@
 
             // Old monolithic-style usage:
             html2pdf(element, options);
-
-
-
-
 
 
         }
