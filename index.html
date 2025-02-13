@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Myraa Silver</title>
 
-
+    <link rel="icon" type="image/x-icon" href="icon.png">
+	<link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"
         integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw=="
@@ -523,16 +524,16 @@
         function generatePDF() {
             let clientName = document.getElementById('clientName').value || "Quote";
             let cityName = ", " + document.getElementById('cityName').value || "";
-            let pdfname = clientName + '.pdf';
-            var today = new Date().toLocaleDateString("en-GB");
+            
+            var today = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
 
-
+            let pdfname = clientName + " - " + today + '.pdf';
 
             let pdfContainer = document.getElementById("pdf-container");
             pdfContainer.innerHTML = ""; // Clear previous content
 
             let tableHTML = `
-        <p style="text-align:center; margin-bottom: 8px; font-size:25px;">श्री</p>
+        <p style="text-align:center; margin-bottom: 4px; font-size:25px;">श्री</p>
         <p style="text-align:center; font-size:22px; margin-top:2px; margin-bottom:0px;"><strong>ESTIMATE</strong></p>
         <p style="text-align: right; margin-top:2px; margin-bottom:0px;"><strong>Date: </strong>${today}</p>
         <p style="margin-top:2px; margin-bottom:12px;"><strong>Client Name:</strong> ${clientName}${cityName}</p>
@@ -639,7 +640,7 @@
             var element = document.getElementById('pdf-container');
 
             var options = {
-                margin:  [.15, .5 , .5, .5],
+                margin:  [.15, .5 , .15, .15],
                 filename: pdfname,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
